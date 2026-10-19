@@ -6,22 +6,22 @@ export const INITIAL_USERS: UserProfile[] = [
     name: 'Alex Johnson',
     email: 'alex.j@example.com',
     phone: '+1 (555) 234-5678',
-    role: 'user',
+    role: 'lost_person',
     finderDiscountTokens: 1, // Has 1 active 30% discount token from being a good Samaritan!
     itemsReportedLost: 2,
-    itemsReportedFound: 1,
+    itemsReportedFound: 0,
     successfulReunions: 1,
-    savedShippingAddress: '742 Evergreen Terrace, Apt 4B, Springfield'
+    savedShippingAddress: '742 Evergreen Terrace, Apt 4B, New York, NY 10023'
   },
   {
     id: 'user_elena',
     name: 'Elena Rostova',
     email: 'elena.r@example.com',
     phone: '+1 (555) 876-5432',
-    role: 'user',
+    role: 'finder_person',
     finderDiscountTokens: 2, // Has 2 discount vouchers
     itemsReportedLost: 0,
-    itemsReportedFound: 3,
+    itemsReportedFound: 2,
     successfulReunions: 2,
     savedShippingAddress: '120 West 44th Street, New York, NY 10036'
   },
@@ -38,8 +38,20 @@ export const INITIAL_USERS: UserProfile[] = [
     courierWalletBalance: 245.50,
     courierDeliveriesCompleted: 18,
     courierRating: 4.95
+  },
+  {
+    id: 'admin_sarah',
+    name: 'Sarah Vance (Admin)',
+    email: 'admin.sarah@reunite.ai',
+    phone: '+1 (555) 000-9999',
+    role: 'admin',
+    finderDiscountTokens: 0,
+    itemsReportedLost: 0,
+    itemsReportedFound: 0,
+    successfulReunions: 42
   }
 ]
+
 
 export const INITIAL_ITEMS: Item[] = [
   {

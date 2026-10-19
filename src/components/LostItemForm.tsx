@@ -167,8 +167,11 @@ export const LostItemForm: React.FC<LostItemFormProps> = ({
     }, 600)
   }
 
-  // Filter user's reported lost items
-  const userLostItems = items.filter(it => it.type === 'lost')
+  // Filter user's reported lost items (Strict role isolation)
+  const userLostItems = items.filter(it => 
+    it.type === 'lost' && (it.userId === currentUser.id || it.userEmail === currentUser.email || currentUser.role === 'admin')
+  )
+
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-10">

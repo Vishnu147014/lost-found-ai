@@ -175,7 +175,11 @@ export const FoundItemForm: React.FC<FoundItemFormProps> = ({
     }, 600)
   }
 
-  const userFoundItems = items.filter(it => it.type === 'found')
+  // Strict role isolation: only items reported found by this user
+  const userFoundItems = items.filter(it => 
+    it.type === 'found' && (it.userId === currentUser.id || it.userEmail === currentUser.email || currentUser.role === 'admin')
+  )
+
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-10">

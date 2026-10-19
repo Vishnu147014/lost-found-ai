@@ -120,7 +120,7 @@ export interface UserProfile {
   name: string
   email: string
   phone: string
-  role: 'user' | 'courier' | 'admin'
+  role: 'lost_person' | 'finder_person' | 'courier' | 'admin' | 'user'
   finderDiscountTokens: number // Count of 30% discount tokens earned for returning found items
   itemsReportedLost: number
   itemsReportedFound: number

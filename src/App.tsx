@@ -20,16 +20,16 @@ import {
 } from './lib/supabase'
 import { scanAndFindAllMatches } from './lib/aiMatcher'
 import { calculateDeliveryPricing, calculateDistanceKm } from './lib/pricing'
-import { Navbar } from './components/Navbar'
+import { Sidebar } from './components/Sidebar'
 import { LostItemForm } from './components/LostItemForm'
 import { FoundItemForm } from './components/FoundItemForm'
-import { AiMatchHub } from './components/AiMatchHub'
 import { DeliveryPortal } from './components/DeliveryPortal'
+import { AdminPortal } from './components/AdminPortal'
 import { InteractiveMap } from './components/InteractiveMap'
 import { SupabaseModal } from './components/SupabaseModal'
 
 export function App() {
-  const [currentTab, setCurrentTab] = useState<'lost' | 'found' | 'ai-matcher' | 'delivery' | 'map'>('lost')
+  const [currentTab, setCurrentTab] = useState<'lost' | 'found' | 'delivery' | 'admin' | 'map'>('lost')
   
   // Data states
   const [items, setItems] = useState<Item[]>([])
@@ -59,7 +59,7 @@ export function App() {
     const loadedUsers = getLocalUsers()
     setUsers(loadedUsers)
     if (!currentUser && loadedUsers.length > 0) {
-      setCurrentUser(loadedUsers[0]) // Default to Alex Johnson
+      setCurrentUser(loadedUsers[0]) // Default to Alex Johnson (Lost Person)
     }
 
     const loadedItems = await fetchAllItems()
@@ -77,10 +77,10 @@ export function App() {
   const handleTriggerReScan = () => {
     const freshMatches = scanAndFindAllMatches(items)
     setMatches(freshMatches)
-    showToast('AI Scan Complete', `Cross-referenced reports and identified ${freshMatches.length} candidate matches.`, 'info')
+    showToast('AI Neural Scan Complete', `Cross-referenced reports and identified ${freshMatches.length} candidate matches.`, 'info')
   }
 
-  // 1. Submit Lost Item
+  // 1. Submit Lost Item (Lost Person User)
   const handleSubmitLostItem = async (newItem: Item) => {
     const created = await createItem(newItem)
     const updatedItems = [created, ...items.filter(i => i.id !== created.id)]
@@ -104,12 +104,12 @@ export function App() {
 
     showToast(
       'Lost Item Registered!', 
-      'AI Neural Radar is now actively scanning discovered items for matching visual contours.', 
+      'Your item is stored securely with your encrypted verification clue. The AI radar is actively scanning found reports.', 
       'success'
     )
   }
 
-  // 2. Submit Found Item
+  // 2. Submit Found Item (Finder Person User)
   const handleSubmitFoundItem = async (newItem: Item) => {
     const created = await createItem(newItem)
     const updatedItems = [created, ...items.filter(i => i.id !== created.id)]
@@ -131,12 +131,12 @@ export function App() {
 
     showToast(
       'Found Item Safely Registered!', 
-      'You are registered as the Good Samaritan! Once reunited with the owner, you earn a 30% shipping discount voucher!', 
+      'Thank you for being a Good Samaritan! When the owner receives this item, you will be rewarded with 30% off your next lost item shipping!', 
       'reward'
     )
   }
 
-  // 3. Confirm Match and Dispatch Courier Pickup Job
+  // 3. Confirm Match and Dispatch Courier Pickup Job (Admin & System)
   const handleConfirmMatchAndDispatchCourier = async (
     match: AIMatchResult,
     lostItem: Item,
@@ -146,7 +146,7 @@ export function App() {
     const distanceKm = calculateDistanceKm(lostItem.coordinates, foundItem.coordinates)
     const pricing = calculateDeliveryPricing(distanceKm, lostItem.category, applyDiscount)
 
-    // Generate random 4-digit verification OTPs
+    // Generate random 4-digit verification OTPs for security
     const pickupOtp = Math.floor(1000 + Math.random() * 9000).toString()
     const deliveryOtp = Math.floor(1000 + Math.random() * 9000).toString()
 
@@ -177,7 +177,7 @@ export function App() {
     await createDeliveryJob(newJob)
     setDeliveries(prev => [newJob, ...prev])
 
-    // Update item statuses to 'shipping_paid' / 'courier_assigned'
+    // Update item statuses to 'courier_assigned'
     await updateItemStatus(lostItem.id, 'courier_assigned', foundItem.id)
     await updateItemStatus(foundItem.id, 'courier_assigned', lostItem.id)
 
@@ -202,12 +202,12 @@ export function App() {
 
     showToast(
       'Courier Dispatched!',
-      `Shipping of $${pricing.netTotalPayable.toFixed(2)} arranged. Job posted to delivery marketplace!`,
+      `Shipping of $${pricing.netTotalPayable.toFixed(2)} arranged. Courier delivery job is now live!`,
       'success'
     )
   }
 
-  // 4. Courier Accepts Gig
+  // 4. Courier Accepts Gig (Delivery Agent)
   const handleAcceptJob = async (
     jobId: string, 
     courier: { id: string; name: string; phone: string; vehicle: 'bicycle' | 'motorcycle' | 'car' | 'van' }
@@ -223,7 +223,7 @@ export function App() {
     )
   }
 
-  // 5. Update Delivery Step (e.g. OTP verified at pickup)
+  // 5. Update Delivery Step (OTP verified at pickup)
   const handleUpdateDeliveryStep = async (jobId: string, nextStatus: DeliveryJob['status']) => {
     await updateDeliveryStatus(jobId, nextStatus)
     const updated = await fetchAllDeliveries()
@@ -242,7 +242,7 @@ export function App() {
       }))
     }
 
-    showToast('Pickup Confirmed!', 'Item is now safely in transit to the owner.', 'success')
+    showToast('Pickup Confirmed via OTP!', 'Item is safely in transit to owner shipping address.', 'success')
   }
 
   // 6. Complete Delivery (OTP verified at owner dropoff)
@@ -270,7 +270,6 @@ export function App() {
     }
 
     // REWARD THE FINDER WITH A 30% SHIPPING DISCOUNT VOUCHER!
-    // (Explicit user requirement: "he rewarded with if next time he lost anything he would have 30% shiiping charges reducded")
     rewardFinderWithDiscount(job.finderName)
 
     // Refresh users
@@ -282,20 +281,28 @@ export function App() {
     }
 
     showToast(
-      'Reunion Successful! 🎉',
-      `Owner received item! Courier paid $${job.courierPayout.toFixed(2)}. Finder rewarded with 30% discount token!`,
+      'Delivery Handover Complete! 🎉',
+      `Owner received item! Courier earned $${job.courierPayout.toFixed(2)}. Finder rewarded with 30% discount voucher!`,
       'reward'
     )
+  }
+
+  // Admin manual status override
+  const handleAdminUpdateItemStatus = async (itemId: string, status: Item['status']) => {
+    await updateItemStatus(itemId, status)
+    const refreshed = await fetchAllItems()
+    setItems(refreshed)
+    showToast('Item Status Updated', `Item #${itemId.slice(-6)} set to ${status}.`, 'info')
   }
 
   const availableJobsCount = deliveries.filter(d => d.status === 'available').length
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans selection:bg-indigo-500 selection:text-white">
+    <div className="min-h-screen bg-slate-950 text-slate-100 flex font-sans selection:bg-indigo-500 selection:text-white">
       
-      {/* Top Navigation */}
+      {/* Left-Side Navigation Bar */}
       {currentUser && (
-        <Navbar
+        <Sidebar
           currentTab={currentTab}
           onSelectTab={setCurrentTab}
           currentUser={currentUser}
@@ -308,110 +315,124 @@ export function App() {
         />
       )}
 
-      {/* Floating Notification Toast */}
-      {notification && (
-        <div className="fixed bottom-6 right-6 z-50 max-w-md w-full animate-slide-up">
-          <div className={`p-4 rounded-2xl shadow-2xl border flex items-start gap-3 backdrop-blur-md ${
-            notification.type === 'reward'
-              ? 'bg-amber-950/90 border-amber-500 text-amber-200'
-              : notification.type === 'info'
-              ? 'bg-indigo-950/90 border-indigo-500 text-indigo-200'
-              : 'bg-emerald-950/90 border-emerald-500 text-emerald-200'
-          }`}>
-            <div className="text-xl shrink-0">
-              {notification.type === 'reward' ? '🎁' : notification.type === 'info' ? '🧠' : '✨'}
+      {/* Main Content Area (offset by 72 on desktop to accommodate left sidebar) */}
+      <div className="flex-1 lg:pl-72 flex flex-col min-h-screen min-w-0">
+        
+        {/* Floating Notification Toast */}
+        {notification && (
+          <div className="fixed bottom-6 right-6 z-50 max-w-md w-full animate-slide-up">
+            <div className={`p-4 rounded-2xl shadow-2xl border flex items-start gap-3 backdrop-blur-md ${
+              notification.type === 'reward'
+                ? 'bg-amber-950/90 border-amber-500 text-amber-200'
+                : notification.type === 'info'
+                ? 'bg-indigo-950/90 border-indigo-500 text-indigo-200'
+                : 'bg-emerald-950/90 border-emerald-500 text-emerald-200'
+            }`}>
+              <div className="text-xl shrink-0">
+                {notification.type === 'reward' ? '🎁' : notification.type === 'info' ? '🧠' : '✨'}
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="font-bold text-sm text-white">{notification.title}</div>
+                <div className="text-xs opacity-90 mt-0.5 leading-relaxed">{notification.desc}</div>
+              </div>
+              <button 
+                onClick={() => setNotification(null)}
+                className="text-xs opacity-60 hover:opacity-100 text-white"
+              >
+                ✕
+              </button>
             </div>
-            <div className="flex-1 min-w-0">
-              <div className="font-bold text-sm text-white">{notification.title}</div>
-              <div className="text-xs opacity-90 mt-0.5 leading-relaxed">{notification.desc}</div>
-            </div>
-            <button 
-              onClick={() => setNotification(null)}
-              className="text-xs opacity-60 hover:opacity-100 text-white"
-            >
-              ✕
-            </button>
           </div>
-        </div>
-      )}
-
-      {/* Main View Render */}
-      <main className="flex-1 pb-16">
-        {currentUser && (
-          <>
-            {currentTab === 'lost' && (
-              <LostItemForm
-                currentUser={currentUser}
-                items={items}
-                onSubmitLostItem={handleSubmitLostItem}
-                onNavigateToMatch={(itemId) => setCurrentTab('ai-matcher')}
-              />
-            )}
-
-            {currentTab === 'found' && (
-              <FoundItemForm
-                currentUser={currentUser}
-                items={items}
-                onSubmitFoundItem={handleSubmitFoundItem}
-                onNavigateToMatch={(itemId) => setCurrentTab('ai-matcher')}
-              />
-            )}
-
-            {currentTab === 'ai-matcher' && (
-              <AiMatchHub
-                items={items}
-                matches={matches}
-                currentUser={currentUser}
-                onTriggerReScan={handleTriggerReScan}
-                onConfirmMatchAndDispatchCourier={handleConfirmMatchAndDispatchCourier}
-              />
-            )}
-
-            {currentTab === 'delivery' && (
-              <DeliveryPortal
-                currentUser={currentUser}
-                deliveries={deliveries}
-                onAcceptJob={handleAcceptJob}
-                onUpdateDeliveryStep={handleUpdateDeliveryStep}
-                onCompleteDelivery={handleCompleteDelivery}
-              />
-            )}
-
-            {currentTab === 'map' && (
-              <InteractiveMap
-                items={items}
-                deliveries={deliveries}
-                onSelectItem={(item) => {
-                  if (item.type === 'lost') setCurrentTab('lost')
-                  else setCurrentTab('found')
-                }}
-              />
-            )}
-          </>
         )}
-      </main>
 
-      {/* Footer */}
-      <footer className="border-t border-slate-900 bg-slate-950/80 text-slate-500 text-xs py-6 px-4">
-        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-2">
-            <span className="font-bold text-slate-300">ReuniteAI</span>
-            <span>— Lost & Found AI Matching, Good Samaritan Rewards & Courier Logistics</span>
+        {/* Dynamic View by Tab */}
+        <main className="flex-1 pb-16">
+          {currentUser && (
+            <>
+              {/* 1. Lost Person Interface */}
+              {currentTab === 'lost' && (
+                <LostItemForm
+                  currentUser={currentUser}
+                  items={items}
+                  onSubmitLostItem={handleSubmitLostItem}
+                  onNavigateToMatch={(itemId) => setCurrentTab('admin')}
+                />
+              )}
+
+              {/* 2. Found Person Interface */}
+              {currentTab === 'found' && (
+                <FoundItemForm
+                  currentUser={currentUser}
+                  items={items}
+                  onSubmitFoundItem={handleSubmitFoundItem}
+                  onNavigateToMatch={(itemId) => setCurrentTab('admin')}
+                />
+              )}
+
+              {/* 3. Delivery Agent Interface */}
+              {currentTab === 'delivery' && (
+                <DeliveryPortal
+                  currentUser={currentUser}
+                  deliveries={deliveries}
+                  onAcceptJob={handleAcceptJob}
+                  onUpdateDeliveryStep={handleUpdateDeliveryStep}
+                  onCompleteDelivery={handleCompleteDelivery}
+                />
+              )}
+
+              {/* 4. Admin Master Portal */}
+              {currentTab === 'admin' && (
+                <AdminPortal
+                  items={items}
+                  matches={matches}
+                  deliveries={deliveries}
+                  users={users}
+                  onTriggerReScan={handleTriggerReScan}
+                  onConfirmMatchAndDispatchCourier={handleConfirmMatchAndDispatchCourier}
+                  onUpdateItemStatus={handleAdminUpdateItemStatus}
+                  onOpenSupabaseModal={() => setSupabaseModalOpen(true)}
+                  isSupabaseLive={isSupabaseLive}
+                />
+              )}
+
+              {/* 5. Live Geospatial Radar */}
+              {currentTab === 'map' && (
+                <InteractiveMap
+                  items={items}
+                  deliveries={deliveries}
+                  onSelectItem={(item) => {
+                    if (item.type === 'lost') setCurrentTab('lost')
+                    else setCurrentTab('found')
+                  }}
+                />
+              )}
+            </>
+          )}
+        </main>
+
+        {/* Global Footer */}
+        <footer className="border-t border-slate-900 bg-slate-950/80 text-slate-500 text-xs py-6 px-6 sm:px-8">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div className="flex items-center gap-2">
+              <span className="font-bold text-slate-300">ReuniteAI</span>
+              <span>— 4-Role Architecture: Lost Person • Finder • Courier • Admin</span>
+            </div>
+            <div className="flex items-center gap-4 text-slate-400">
+              <button 
+                onClick={() => setSupabaseModalOpen(true)}
+                className="hover:text-emerald-400 transition-colors"
+              >
+                Supabase PostgreSQL Schema
+              </button>
+              <span>•</span>
+              <span>30% Samaritan Incentive</span>
+              <span>•</span>
+              <span>Dual OTP Verified Handoff</span>
+            </div>
           </div>
-          <div className="flex items-center gap-4 text-slate-400">
-            <button 
-              onClick={() => setSupabaseModalOpen(true)}
-              className="hover:text-emerald-400 transition-colors"
-            >
-              Supabase PostgreSQL Schema
-            </button>
-            <span>•</span>
-            <span>30% Finder Shipping Incentive</span>
-            <span>•</span>
-            <span>OTP Verified Safe Handover</span>
-          </div>
-        </div>
-      </footer>
+        </footer>
+
+      </div>
 
       {/* Supabase Configuration Modal */}
       <SupabaseModal
