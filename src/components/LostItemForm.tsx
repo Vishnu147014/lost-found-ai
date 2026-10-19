@@ -557,7 +557,7 @@ export const LostItemForm: React.FC<LostItemFormProps> = ({
                         1. Reported
                       </div>
                       <div className={`p-1 rounded border ${
-                        item.status === 'matched' || item.status === 'in_transit' || item.status === 'delivered'
+                        item.status === 'matched' || item.status === 'courier_assigned' || item.status === 'in_transit' || item.status === 'delivered'
                           ? 'bg-purple-950/80 text-purple-300 border-purple-800'
                           : 'bg-slate-900 text-slate-600 border-slate-800'
                       }`}>
@@ -566,6 +566,8 @@ export const LostItemForm: React.FC<LostItemFormProps> = ({
                       <div className={`p-1 rounded border ${
                         item.status === 'in_transit' || item.status === 'delivered'
                           ? 'bg-cyan-950/80 text-cyan-300 border-cyan-800'
+                          : item.status === 'courier_assigned'
+                          ? 'bg-cyan-950/40 text-cyan-400 border-cyan-900'
                           : 'bg-slate-900 text-slate-600 border-slate-800'
                       }`}>
                         3. In Courier
@@ -580,6 +582,79 @@ export const LostItemForm: React.FC<LostItemFormProps> = ({
                     </div>
                   </div>
 
+                  {/* CLEAR LIVE COURIER TRACKING MAP FOR OWNER */}
+                  {(item.status === 'in_transit' || item.status === 'courier_assigned') && (
+                    <div className="rounded-xl overflow-hidden border border-cyan-500/40 bg-slate-950 p-3 space-y-2.5">
+                      <div className="flex items-center justify-between text-xs">
+                        <span className="font-bold text-white flex items-center gap-1.5">
+                          <Truck className="w-3.5 h-3.5 text-cyan-400" />
+                          <span>Live Delivery Tracking (En Route)</span>
+                        </span>
+                        <span className="text-[10px] text-cyan-400 font-mono bg-cyan-950 px-2 py-0.5 rounded border border-cyan-800 font-bold">
+                          ETA: 15-20 Min
+                        </span>
+                      </div>
+
+                      {/* Mini Live Map */}
+                      <div 
+                        className="relative h-28 w-full rounded-lg bg-slate-900 border border-slate-800 overflow-hidden"
+                        style={{
+                          backgroundImage: `
+                            radial-gradient(circle at 50% 50%, rgba(6, 182, 212, 0.12) 0%, transparent 70%),
+                            linear-gradient(to right, #1e293b 1px, transparent 1px),
+                            linear-gradient(to bottom, #1e293b 1px, transparent 1px)
+                          `,
+                          backgroundSize: '100% 100%, 20px 20px, 20px 20px'
+                        }}
+                      >
+                        <svg className="absolute inset-0 w-full h-full">
+                          <line x1="20%" y1="70%" x2="80%" y2="30%" stroke="#06b6d4" strokeWidth="3" strokeDasharray="5 3" className="animate-pulse" />
+                        </svg>
+
+                        {/* Finder Pickup Point */}
+                        <div className="absolute left-[20%] top-[70%] -translate-x-1/2 -translate-y-1/2 flex flex-col items-center">
+                          <div className="w-6 h-6 rounded-full bg-emerald-600 text-white flex items-center justify-center font-bold text-[10px] border border-white">
+                            A
+                          </div>
+                          <span className="mt-0.5 text-[9px] text-emerald-300 bg-slate-950/80 px-1 rounded whitespace-nowrap">
+                            Finder
+                          </span>
+                        </div>
+
+                        {/* Moving Courier */}
+                        <div className="absolute left-[54%] top-[48%] -translate-x-1/2 -translate-y-1/2 flex flex-col items-center animate-bounce">
+                          <div className="w-7 h-7 rounded-xl bg-cyan-500 text-slate-950 flex items-center justify-center shadow-lg border border-white">
+                            <Truck className="w-3.5 h-3.5" />
+                          </div>
+                          <span className="text-[9px] font-bold text-cyan-300 bg-cyan-950 px-1 rounded whitespace-nowrap">
+                            Courier Marco
+                          </span>
+                        </div>
+
+                        {/* Owner Delivery Point */}
+                        <div className="absolute left-[80%] top-[30%] -translate-x-1/2 -translate-y-1/2 flex flex-col items-center">
+                          <div className="w-6 h-6 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold text-[10px] border border-white">
+                            B
+                          </div>
+                          <span className="mt-0.5 text-[9px] text-blue-300 bg-slate-950/80 px-1 rounded whitespace-nowrap">
+                            Your Doorstep
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Secret Delivery OTP for Owner */}
+                      <div className="p-2.5 rounded-lg bg-cyan-950/80 border border-cyan-800 text-xs flex items-center justify-between">
+                        <div>
+                          <div className="text-[10px] text-slate-400">Your Secure Delivery OTP:</div>
+                          <div className="text-base font-black text-cyan-300 font-mono tracking-widest">3175</div>
+                        </div>
+                        <span className="text-[10px] text-cyan-400 max-w-[170px] text-right">
+                          Give this OTP to the courier only upon physical inspection.
+                        </span>
+                      </div>
+                    </div>
+                  )}
+
                   {/* Action Link to AI Match Hub if matched */}
                   {item.status === 'matched' && (
                     <button
@@ -592,6 +667,7 @@ export const LostItemForm: React.FC<LostItemFormProps> = ({
                   )}
                 </div>
               ))}
+
             </div>
           </div>
 

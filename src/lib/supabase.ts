@@ -98,11 +98,32 @@ export function getLocalUsers(): UserProfile[] {
       localStorage.setItem(USERS_STORAGE_KEY, JSON.stringify(INITIAL_USERS))
       return INITIAL_USERS
     }
-    return JSON.parse(data)
+    const parsed: UserProfile[] = JSON.parse(data)
+    // Merge any missing initial users (such as courier_rahul or admin_sarah)
+    const existingMap = new Map(parsed.map(u => [u.id, u]))
+    let modified = false
+    for (const initUser of INITIAL_USERS) {
+      if (!existingMap.has(initUser.id)) {
+        parsed.push(initUser)
+        modified = true
+      } else {
+        // Upgrade existing with security fields if missing
+        const current = existingMap.get(initUser.id)!
+        if (!current.verificationStatus && initUser.verificationStatus) {
+          Object.assign(current, initUser)
+          modified = true
+        }
+      }
+    }
+    if (modified) {
+      localStorage.setItem(USERS_STORAGE_KEY, JSON.stringify(parsed))
+    }
+    return parsed
   } catch {
     return INITIAL_USERS
   }
 }
+
 
 export function saveLocalUsers(users: UserProfile[]): void {
   localStorage.setItem(USERS_STORAGE_KEY, JSON.stringify(users))
@@ -375,3 +396,88 @@ export function creditCourierWallet(courierId: string, amount: number): void {
   })
   saveLocalUsers(updated)
 }
+
+/**
+ * Updates a courier's Aadhaar and biometric face verification data
+ */
+export function updateCourierKyc(courierId: string, kyc: Partial<UserProfile>): void {
+  const users = getLocalUsers()
+  const updated = users.map(u => {
+    if (u.id === courierId) {
+      return {
+        ...u,
+        ...kyc,
+        verificationStatus: kyc.verificationStatus || 'pending'
+      }
+    }
+    return u
+  })
+  saveLocalUsers(updated)
+}
+
+/**
+ * Admin approves a delivery agent's Aadhaar and face recognition verification
+ */
+export function adminApproveCourier(courierId: string): void {
+  const users = getLocalUsers()
+  const updated = users.map(u => {
+    if (u.id === courierId) {
+      return {
+        ...u,
+        verificationStatus: 'verified' as const,
+        verifiedAt: new Date().toISOString()
+      }
+    }
+    return u
+  })
+  saveLocalUsers(updated)
+}
+
+/**
+ * Admin rejects a delivery agent's Aadhaar or face verification
+ */
+export function adminRejectCourier(courierId: string, reason?: string): void {
+  const users = getLocalUsers()
+  const updated = users.map(u => {
+    if (u.id === courierId) {
+      return {
+        ...u,
+        verificationStatus: 'rejected' as const,
+        verificationNotes: reason || 'Aadhaar / Biometric face match mismatch.'
+      }
+    }
+    return u
+  })
+  saveLocalUsers(updated)
+}
+
+/**
+ * Authenticate user with email and password
+ */
+export function authenticateUser(email: string, password?: string): UserProfile | null {
+  const users = getLocalUsers()
+  const cleanEmail = email.trim().toLowerCase()
+  const found = users.find(u => u.email.toLowerCase() === cleanEmail)
+  if (found) {
+    if (!password || !found.password || found.password === password) {
+      return found
+    }
+  }
+  return null
+}
+
+/**
+ * Register a new user profile
+ */
+export function registerUser(profile: UserProfile): UserProfile {
+  const users = getLocalUsers()
+  const cleanEmail = profile.email.trim().toLowerCase()
+  const existing = users.find(u => u.email.toLowerCase() === cleanEmail)
+  if (existing) {
+    return existing
+  }
+  const updated = [...users, profile]
+  saveLocalUsers(updated)
+  return profile
+}
+

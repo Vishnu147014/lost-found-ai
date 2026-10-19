@@ -6,6 +6,7 @@ export const INITIAL_USERS: UserProfile[] = [
     name: 'Alex Johnson',
     email: 'alex.j@example.com',
     phone: '+1 (555) 234-5678',
+    password: 'password123',
     role: 'lost_person',
     finderDiscountTokens: 1, // Has 1 active 30% discount token from being a good Samaritan!
     itemsReportedLost: 2,
@@ -18,6 +19,7 @@ export const INITIAL_USERS: UserProfile[] = [
     name: 'Elena Rostova',
     email: 'elena.r@example.com',
     phone: '+1 (555) 876-5432',
+    password: 'password123',
     role: 'finder_person',
     finderDiscountTokens: 2, // Has 2 discount vouchers
     itemsReportedLost: 0,
@@ -30,6 +32,7 @@ export const INITIAL_USERS: UserProfile[] = [
     name: 'Marco Silva',
     email: 'marco.courier@fastdrop.com',
     phone: '+1 (555) 901-2345',
+    password: 'password123',
     role: 'courier',
     finderDiscountTokens: 0,
     itemsReportedLost: 0,
@@ -37,13 +40,48 @@ export const INITIAL_USERS: UserProfile[] = [
     successfulReunions: 18,
     courierWalletBalance: 245.50,
     courierDeliveriesCompleted: 18,
-    courierRating: 4.95
+    courierRating: 4.95,
+    // KYC Security & Verification Details
+    aadharNumber: '5849-2104-9938',
+    aadharPhoto: 'https://images.unsplash.com/photo-1544717305-2782549b5136?auto=format&fit=crop&w=400&q=80',
+    facePhoto: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=400&q=80',
+    faceMatchScore: 98.6,
+    verificationStatus: 'verified',
+    vehicleType: 'motorcycle',
+    vehicleNumber: 'MH-02-CD-4921',
+    drivingLicense: 'DL-9948210385',
+    verifiedAt: '2026-10-10T14:30:00Z'
+  },
+  {
+    id: 'courier_rahul',
+    name: 'Rahul Verma',
+    email: 'rahul.courier@fastdrop.com',
+    phone: '+1 (555) 789-0123',
+    password: 'password123',
+    role: 'courier',
+    finderDiscountTokens: 0,
+    itemsReportedLost: 0,
+    itemsReportedFound: 0,
+    successfulReunions: 0,
+    courierWalletBalance: 0.00,
+    courierDeliveriesCompleted: 0,
+    courierRating: 5.00,
+    // KYC Security & Verification Details Pending Admin Review
+    aadharNumber: '8392-4109-7712',
+    aadharPhoto: 'https://images.unsplash.com/photo-1589829545856-d10d557cf95f?auto=format&fit=crop&w=400&q=80',
+    facePhoto: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=400&q=80',
+    faceMatchScore: 96.2,
+    verificationStatus: 'pending',
+    vehicleType: 'motorcycle',
+    vehicleNumber: 'KA-01-AB-1234',
+    drivingLicense: 'DL-1420239912'
   },
   {
     id: 'admin_sarah',
     name: 'Sarah Vance (Admin)',
     email: 'admin.sarah@reunite.ai',
     phone: '+1 (555) 000-9999',
+    password: 'password123',
     role: 'admin',
     finderDiscountTokens: 0,
     itemsReportedLost: 0,
@@ -51,6 +89,7 @@ export const INITIAL_USERS: UserProfile[] = [
     successfulReunions: 42
   }
 ]
+
 
 
 export const INITIAL_ITEMS: Item[] = [

@@ -120,6 +120,7 @@ export interface UserProfile {
   name: string
   email: string
   phone: string
+  password?: string
   role: 'lost_person' | 'finder_person' | 'courier' | 'admin' | 'user'
   finderDiscountTokens: number // Count of 30% discount tokens earned for returning found items
   itemsReportedLost: number
@@ -129,4 +130,16 @@ export interface UserProfile {
   courierDeliveriesCompleted?: number
   courierRating?: number
   savedShippingAddress?: string
+  // Security & KYC Identity Verification for Couriers & Users
+  aadharNumber?: string
+  aadharPhoto?: string
+  facePhoto?: string
+  faceMatchScore?: number // 0 - 100%
+  verificationStatus?: 'unverified' | 'pending' | 'verified' | 'rejected'
+  vehicleType?: 'bicycle' | 'motorcycle' | 'car' | 'van'
+  vehicleNumber?: string
+  drivingLicense?: string
+  verificationNotes?: string
+  verifiedAt?: string
 }
+

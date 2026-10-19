@@ -552,6 +552,19 @@ export const FoundItemForm: React.FC<FoundItemFormProps> = ({
                     </div>
                   </div>
 
+                  {/* Courier Pickup OTP for Finder */}
+                  {(item.status === 'in_transit' || item.status === 'courier_assigned') && (
+                    <div className="p-2.5 rounded-xl bg-emerald-950/80 border border-emerald-800 text-xs flex items-center justify-between">
+                      <div>
+                        <div className="text-[10px] text-emerald-400 font-semibold">Your 4-Digit Pickup OTP:</div>
+                        <div className="text-base font-black text-white font-mono tracking-widest">8492</div>
+                      </div>
+                      <span className="text-[10px] text-emerald-300 max-w-[160px] text-right">
+                        Provide this code to courier Marco at pickup to release the item.
+                      </span>
+                    </div>
+                  )}
+
                   {item.status === 'matched' && (
                     <button
                       onClick={() => onNavigateToMatch(item.id)}
@@ -563,6 +576,7 @@ export const FoundItemForm: React.FC<FoundItemFormProps> = ({
                   )}
                 </div>
               ))}
+
             </div>
           </div>
 

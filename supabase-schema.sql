@@ -6,13 +6,13 @@
 -- 1. Enable UUID Extension
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
--- 2. User Profiles Table
+-- 2. User Profiles Table (with Aadhaar & Biometric Face Verification for Couriers)
 CREATE TABLE IF NOT EXISTS public.profiles (
   id UUID REFERENCES auth.users ON DELETE CASCADE PRIMARY KEY,
   name TEXT NOT NULL,
   email TEXT UNIQUE NOT NULL,
   phone TEXT,
-  role TEXT DEFAULT 'user' CHECK (role IN ('user', 'courier', 'admin')),
+  role TEXT DEFAULT 'lost_person' CHECK (role IN ('lost_person', 'finder_person', 'courier', 'admin', 'user')),
   finder_discount_tokens INT DEFAULT 0 CHECK (finder_discount_tokens >= 0),
   items_reported_lost INT DEFAULT 0,
   items_reported_found INT DEFAULT 0,
@@ -21,8 +21,20 @@ CREATE TABLE IF NOT EXISTS public.profiles (
   courier_deliveries_completed INT DEFAULT 0,
   courier_rating NUMERIC(3, 2) DEFAULT 5.00,
   saved_shipping_address TEXT,
+  -- Security & KYC Identity Columns
+  aadhar_number TEXT,
+  aadhar_photo_url TEXT,
+  face_photo_url TEXT,
+  face_match_score NUMERIC(5, 2),
+  verification_status TEXT DEFAULT 'pending' CHECK (verification_status IN ('unverified', 'pending', 'verified', 'rejected')),
+  vehicle_type TEXT CHECK (vehicle_type IN ('bicycle', 'motorcycle', 'car', 'van')),
+  vehicle_number TEXT,
+  driving_license TEXT,
+  verification_notes TEXT,
+  verified_at TIMESTAMPTZ,
   created_at TIMESTAMPTZ DEFAULT TIMEZONE('utc'::text, NOW()) NOT NULL
 );
+
 
 -- 3. Items (Lost & Found) Table
 CREATE TABLE IF NOT EXISTS public.items (

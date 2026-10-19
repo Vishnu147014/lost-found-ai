@@ -16,7 +16,10 @@ import {
   saveLocalUsers, 
   creditCourierWallet, 
   rewardFinderWithDiscount, 
-  isSupabaseConfigured 
+  isSupabaseConfigured,
+  adminApproveCourier,
+  adminRejectCourier,
+  updateCourierKyc
 } from './lib/supabase'
 import { scanAndFindAllMatches } from './lib/aiMatcher'
 import { calculateDeliveryPricing, calculateDistanceKm } from './lib/pricing'
@@ -27,6 +30,7 @@ import { DeliveryPortal } from './components/DeliveryPortal'
 import { AdminPortal } from './components/AdminPortal'
 import { InteractiveMap } from './components/InteractiveMap'
 import { SupabaseModal } from './components/SupabaseModal'
+import { AuthModal } from './components/AuthModal'
 
 export function App() {
   const [currentTab, setCurrentTab] = useState<'lost' | 'found' | 'delivery' | 'admin' | 'map'>('lost')
@@ -41,6 +45,9 @@ export function App() {
   // Supabase status & modal
   const [isSupabaseLive, setIsSupabaseLive] = useState(isSupabaseConfigured())
   const [supabaseModalOpen, setSupabaseModalOpen] = useState(false)
+  
+  // Authentication Modal state
+  const [authModalOpen, setAuthModalOpen] = useState(false)
 
   // Notification toast state
   const [notification, setNotification] = useState<{ title: string; desc: string; type: 'success' | 'info' | 'reward' } | null>(null)
@@ -295,6 +302,48 @@ export function App() {
     showToast('Item Status Updated', `Item #${itemId.slice(-6)} set to ${status}.`, 'info')
   }
 
+  // Admin Courier KYC Approvals
+  const handleApproveCourier = (courierId: string) => {
+    adminApproveCourier(courierId)
+    const refreshed = getLocalUsers()
+    setUsers(refreshed)
+    if (currentUser && currentUser.id === courierId) {
+      const self = refreshed.find(u => u.id === courierId)
+      if (self) setCurrentUser(self)
+    }
+    showToast('Courier Approved!', 'Aadhaar Card and Biometric Face Scan authorized. Driver can now accept gigs.', 'success')
+  }
+
+  const handleRejectCourier = (courierId: string, reason?: string) => {
+    adminRejectCourier(courierId, reason)
+    const refreshed = getLocalUsers()
+    setUsers(refreshed)
+    if (currentUser && currentUser.id === courierId) {
+      const self = refreshed.find(u => u.id === courierId)
+      if (self) setCurrentUser(self)
+    }
+    showToast('Courier Authorization Rejected', reason || 'Identity documents flagged.', 'info')
+  }
+
+  const handleUpdateCourierKyc = (kycData: Partial<UserProfile>) => {
+    if (!currentUser) return
+    updateCourierKyc(currentUser.id, kycData)
+    const refreshed = getLocalUsers()
+    setUsers(refreshed)
+    const self = refreshed.find(u => u.id === currentUser.id)
+    if (self) setCurrentUser(self)
+    showToast('KYC Submitted', 'Aadhaar & Biometric Face Scan sent to Admin for clearance.', 'info')
+  }
+
+  const handleLoginSuccess = (user: UserProfile) => {
+    setCurrentUser(user)
+    if (user.role === 'lost_person') setCurrentTab('lost')
+    else if (user.role === 'finder_person') setCurrentTab('found')
+    else if (user.role === 'courier') setCurrentTab('delivery')
+    else if (user.role === 'admin') setCurrentTab('admin')
+    showToast(`Welcome, ${user.name}!`, `Authenticated as ${user.role.replace('_', ' ').toUpperCase()}.`, 'success')
+  }
+
   const availableJobsCount = deliveries.filter(d => d.status === 'available').length
 
   return (
@@ -309,6 +358,7 @@ export function App() {
           allUsers={users}
           onSelectUser={(u) => setCurrentUser(u)}
           onOpenSupabaseModal={() => setSupabaseModalOpen(true)}
+          onOpenAuthModal={() => setAuthModalOpen(true)}
           isSupabaseLive={isSupabaseLive}
           matchCount={matches.length}
           availableJobsCount={availableJobsCount}
@@ -377,6 +427,7 @@ export function App() {
                   onAcceptJob={handleAcceptJob}
                   onUpdateDeliveryStep={handleUpdateDeliveryStep}
                   onCompleteDelivery={handleCompleteDelivery}
+                  onUpdateKyc={handleUpdateCourierKyc}
                 />
               )}
 
@@ -392,6 +443,8 @@ export function App() {
                   onUpdateItemStatus={handleAdminUpdateItemStatus}
                   onOpenSupabaseModal={() => setSupabaseModalOpen(true)}
                   isSupabaseLive={isSupabaseLive}
+                  onApproveCourier={handleApproveCourier}
+                  onRejectCourier={handleRejectCourier}
                 />
               )}
 
@@ -425,7 +478,7 @@ export function App() {
                 Supabase PostgreSQL Schema
               </button>
               <span>•</span>
-              <span>30% Samaritan Incentive</span>
+              <span>Aadhaar & Face Recognition Verified</span>
               <span>•</span>
               <span>Dual OTP Verified Handoff</span>
             </div>
@@ -442,6 +495,14 @@ export function App() {
           setIsSupabaseLive(isSupabaseConfigured())
           loadAllData()
         }}
+      />
+
+      {/* Authentication & Role Login Modal */}
+      <AuthModal
+        isOpen={authModalOpen}
+        onClose={() => setAuthModalOpen(false)}
+        onLoginSuccess={handleLoginSuccess}
+        allUsers={users}
       />
 
     </div>

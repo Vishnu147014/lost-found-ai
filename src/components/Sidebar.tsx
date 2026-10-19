@@ -26,10 +26,12 @@ interface SidebarProps {
   allUsers: UserProfile[]
   onSelectUser: (user: UserProfile) => void
   onOpenSupabaseModal: () => void
+  onOpenAuthModal: () => void
   isSupabaseLive: boolean
   matchCount: number
   availableJobsCount: number
 }
+
 
 export const Sidebar: React.FC<SidebarProps> = ({
   currentTab,
@@ -38,10 +40,12 @@ export const Sidebar: React.FC<SidebarProps> = ({
   allUsers,
   onSelectUser,
   onOpenSupabaseModal,
+  onOpenAuthModal,
   isSupabaseLive,
   matchCount,
   availableJobsCount
 }) => {
+
   const [mobileOpen, setMobileOpen] = useState(false)
   const [userDropdownOpen, setUserDropdownOpen] = useState(false)
 
@@ -196,10 +200,25 @@ export const Sidebar: React.FC<SidebarProps> = ({
                       {u.id === currentUser.id && <CheckCircle2 className="w-4 h-4 text-indigo-400" />}
                     </button>
                   ))}
+                  
+                  <div className="pt-1.5 border-t border-slate-800 mt-1">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setUserDropdownOpen(false)
+                        onOpenAuthModal()
+                      }}
+                      className="w-full py-2 px-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs flex items-center justify-center gap-1.5 transition-colors"
+                    >
+                      <UserCheck className="w-3.5 h-3.5" />
+                      <span>Sign In / Register Portal</span>
+                    </button>
+                  </div>
                 </div>
               )}
             </div>
           </div>
+
 
           {/* Vertical Navigation Menu Options */}
           <div className="p-3 space-y-1.5">
