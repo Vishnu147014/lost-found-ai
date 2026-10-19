@@ -347,7 +347,7 @@ export function App() {
   const availableJobsCount = deliveries.filter(d => d.status === 'available').length
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex font-sans selection:bg-indigo-500 selection:text-white">
+    <div className="min-h-screen bg-[#f8fafc] text-slate-900 flex font-sans selection:bg-indigo-500 selection:text-white">
       
       {/* Left-Side Navigation Bar */}
       {currentUser && (
@@ -366,28 +366,28 @@ export function App() {
       )}
 
       {/* Main Content Area (offset by 72 on desktop to accommodate left sidebar) */}
-      <div className="flex-1 lg:pl-72 flex flex-col min-h-screen min-w-0">
+      <div className="flex-1 lg:pl-72 flex flex-col min-h-screen min-w-0 bg-[#f8fafc]">
         
         {/* Floating Notification Toast */}
         {notification && (
           <div className="fixed bottom-6 right-6 z-50 max-w-md w-full animate-slide-up">
-            <div className={`p-4 rounded-2xl shadow-2xl border flex items-start gap-3 backdrop-blur-md ${
+            <div className={`p-4 rounded-2xl shadow-xl border flex items-start gap-3 backdrop-blur-md ${
               notification.type === 'reward'
-                ? 'bg-amber-950/90 border-amber-500 text-amber-200'
+                ? 'bg-amber-50 border-amber-200 text-amber-900 shadow-amber-500/10'
                 : notification.type === 'info'
-                ? 'bg-indigo-950/90 border-indigo-500 text-indigo-200'
-                : 'bg-emerald-950/90 border-emerald-500 text-emerald-200'
+                ? 'bg-indigo-50 border-indigo-200 text-indigo-900 shadow-indigo-500/10'
+                : 'bg-emerald-50 border-emerald-200 text-emerald-900 shadow-emerald-500/10'
             }`}>
               <div className="text-xl shrink-0">
                 {notification.type === 'reward' ? '🎁' : notification.type === 'info' ? '🧠' : '✨'}
               </div>
               <div className="flex-1 min-w-0">
-                <div className="font-bold text-sm text-white">{notification.title}</div>
-                <div className="text-xs opacity-90 mt-0.5 leading-relaxed">{notification.desc}</div>
+                <div className="font-bold text-sm text-slate-900">{notification.title}</div>
+                <div className="text-xs text-slate-600 mt-0.5 leading-relaxed">{notification.desc}</div>
               </div>
               <button 
                 onClick={() => setNotification(null)}
-                className="text-xs opacity-60 hover:opacity-100 text-white"
+                className="text-xs text-slate-400 hover:text-slate-600 transition-colors"
               >
                 ✕
               </button>
@@ -464,16 +464,16 @@ export function App() {
         </main>
 
         {/* Global Footer */}
-        <footer className="border-t border-slate-900 bg-slate-950/80 text-slate-500 text-xs py-6 px-6 sm:px-8">
+        <footer className="border-t border-slate-200 bg-white text-slate-500 text-xs py-6 px-6 sm:px-8">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
             <div className="flex items-center gap-2">
-              <span className="font-bold text-slate-300">ReuniteAI</span>
+              <span className="font-bold text-slate-800">ReuniteAI</span>
               <span>— 4-Role Architecture: Lost Person • Finder • Courier • Admin</span>
             </div>
-            <div className="flex items-center gap-4 text-slate-400">
+            <div className="flex items-center gap-4 text-slate-500">
               <button 
                 onClick={() => setSupabaseModalOpen(true)}
-                className="hover:text-emerald-400 transition-colors"
+                className="hover:text-emerald-600 transition-colors font-medium"
               >
                 Supabase PostgreSQL Schema
               </button>

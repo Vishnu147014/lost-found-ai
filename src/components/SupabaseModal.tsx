@@ -78,15 +78,7 @@ CREATE TABLE IF NOT EXISTS public.deliveries (
   courier_phone TEXT,
   courier_vehicle TEXT,
   pickup_address TEXT NOT NULL,
-  pickup_lat NUMERIC(10, 7) NOT NULL,
-  pickup_lng NUMERIC(10, 7) NOT NULL,
-  finder_name TEXT NOT NULL,
-  finder_phone TEXT NOT NULL,
   delivery_address TEXT NOT NULL,
-  delivery_lat NUMERIC(10, 7) NOT NULL,
-  delivery_lng NUMERIC(10, 7) NOT NULL,
-  owner_name TEXT NOT NULL,
-  owner_phone TEXT NOT NULL,
   distance_km NUMERIC(8, 2) NOT NULL,
   courier_payout NUMERIC(8, 2) NOT NULL,
   platform_fee NUMERIC(8, 2) NOT NULL,
@@ -116,42 +108,42 @@ CREATE POLICY "Public update deliveries" ON public.deliveries FOR UPDATE USING (
   const isLive = isSupabaseConfigured()
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md">
-      <div className="bg-slate-900 border border-slate-700 rounded-3xl max-w-2xl w-full p-6 sm:p-8 shadow-2xl space-y-6 max-h-[90vh] overflow-y-auto">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-xs animate-fade-in">
+      <div className="bg-white border border-slate-200 rounded-3xl max-w-2xl w-full p-6 sm:p-8 shadow-2xl space-y-6 max-h-[90vh] overflow-y-auto text-slate-900">
         
         {/* Header */}
-        <div className="flex items-center justify-between pb-4 border-b border-slate-800">
+        <div className="flex items-center justify-between pb-4 border-b border-slate-100">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center border border-emerald-500/30">
+            <div className="w-10 h-10 rounded-2xl bg-emerald-50 text-emerald-700 flex items-center justify-center border border-emerald-200">
               <Database className="w-5 h-5" />
             </div>
             <div>
-              <h2 className="text-lg font-bold text-white flex items-center gap-2">
+              <h2 className="text-lg font-bold text-slate-900 flex items-center gap-2">
                 <span>Supabase Backend & Database</span>
-                <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold ${
-                  isLive ? 'bg-emerald-950 text-emerald-300 border border-emerald-800' : 'bg-amber-950 text-amber-300 border border-amber-800'
+                <span className={`text-[10px] px-2.5 py-0.5 rounded-full font-bold ${
+                  isLive ? 'bg-emerald-50 text-emerald-800 border border-emerald-200' : 'bg-amber-50 text-amber-800 border border-amber-200'
                 }`}>
                   {isLive ? 'Live Connected' : 'Mock / Local Storage Mode'}
                 </span>
               </h2>
-              <p className="text-xs text-slate-400">PostgreSQL Cloud Database & Realtime Storage Setup</p>
+              <p className="text-xs text-slate-500">PostgreSQL Cloud Database & Realtime Storage Setup</p>
             </div>
           </div>
           <button 
             onClick={onClose}
-            className="w-8 h-8 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-300 flex items-center justify-center text-sm font-bold"
+            className="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center text-sm font-bold"
           >
             ✕
           </button>
         </div>
 
         {/* Status Callout */}
-        <div className="p-4 rounded-2xl bg-slate-950 border border-slate-800 space-y-2 text-xs">
-          <div className="font-semibold text-slate-200 flex items-center gap-1.5">
-            <Server className="w-4 h-4 text-emerald-400" />
+        <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-2 text-xs">
+          <div className="font-bold text-slate-900 flex items-center gap-1.5">
+            <Server className="w-4 h-4 text-emerald-600" />
             <span>Dual-Mode Architecture:</span>
           </div>
-          <p className="text-slate-400 leading-relaxed">
+          <p className="text-slate-600 leading-relaxed">
             The website is engineered with a dual-mode persistence architecture: it works 100% out-of-the-box using browser state & local storage. When you enter your Supabase URL & Key below, it automatically synchronizes with your cloud PostgreSQL tables.
           </p>
         </div>
@@ -159,8 +151,8 @@ CREATE POLICY "Public update deliveries" ON public.deliveries FOR UPDATE USING (
         {/* Credentials Form */}
         <div className="space-y-4">
           <div>
-            <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1 flex items-center gap-1.5">
-              <Link className="w-3.5 h-3.5 text-indigo-400" />
+            <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1 flex items-center gap-1.5">
+              <Link className="w-3.5 h-3.5 text-indigo-600" />
               <span>Project URL (`VITE_SUPABASE_URL`)</span>
             </label>
             <input
@@ -168,13 +160,13 @@ CREATE POLICY "Public update deliveries" ON public.deliveries FOR UPDATE USING (
               value={url}
               onChange={(e) => setUrl(e.target.value)}
               placeholder="https://your-project-id.supabase.co"
-              className="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-700 rounded-xl text-xs text-slate-100 font-mono focus:outline-none focus:border-emerald-500"
+              className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-xs text-slate-900 font-mono focus:outline-none focus:border-emerald-500 focus:bg-white"
             />
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1 flex items-center gap-1.5">
-              <Key className="w-3.5 h-3.5 text-emerald-400" />
+            <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1 flex items-center gap-1.5">
+              <Key className="w-3.5 h-3.5 text-emerald-600" />
               <span>Anon Public API Key (`VITE_SUPABASE_ANON_KEY`)</span>
             </label>
             <input
@@ -182,13 +174,13 @@ CREATE POLICY "Public update deliveries" ON public.deliveries FOR UPDATE USING (
               value={key}
               onChange={(e) => setKey(e.target.value)}
               placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
-              className="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-700 rounded-xl text-xs text-slate-100 font-mono focus:outline-none focus:border-emerald-500"
+              className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-xs text-slate-900 font-mono focus:outline-none focus:border-emerald-500 focus:bg-white"
             />
           </div>
 
           {testMessage && (
-            <div className="p-3 rounded-xl bg-emerald-950/80 border border-emerald-500/50 text-emerald-200 text-xs flex items-center gap-2">
-              <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+            <div className="p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs flex items-center gap-2">
+              <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
               <span>{testMessage}</span>
             </div>
           )}
@@ -197,7 +189,7 @@ CREATE POLICY "Public update deliveries" ON public.deliveries FOR UPDATE USING (
             <button
               type="button"
               onClick={handleSave}
-              className="flex-1 py-2.5 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-lg shadow-emerald-900/40 transition-colors"
+              className="flex-1 py-2.5 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-xs transition-colors"
             >
               <Database className="w-4 h-4" />
               <span>Save & Connect Supabase</span>
@@ -206,23 +198,23 @@ CREATE POLICY "Public update deliveries" ON public.deliveries FOR UPDATE USING (
         </div>
 
         {/* Copy SQL Schema Section */}
-        <div className="pt-4 border-t border-slate-800 space-y-3">
+        <div className="pt-4 border-t border-slate-100 space-y-3">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-bold text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
-              <ShieldCheck className="w-4 h-4 text-emerald-400" />
+            <span className="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
+              <ShieldCheck className="w-4 h-4 text-emerald-600" />
               <span>One-Click PostgreSQL SQL Schema</span>
             </span>
             <button
               type="button"
               onClick={handleCopySchema}
-              className="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-xl text-xs font-semibold flex items-center gap-1.5 border border-slate-700 transition-colors"
+              className="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-semibold flex items-center gap-1.5 border border-slate-200 transition-colors shadow-xs"
             >
-              {copied ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
+              {copied ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
               <span>{copied ? 'Copied to Clipboard!' : 'Copy SQL Script'}</span>
             </button>
           </div>
 
-          <div className="p-3 rounded-xl bg-slate-950 border border-slate-800 text-[11px] font-mono text-slate-400 max-h-32 overflow-y-auto">
+          <div className="p-3.5 rounded-xl bg-slate-900 border border-slate-800 text-[11px] font-mono text-emerald-400 max-h-32 overflow-y-auto">
             <pre>
 {`-- Run in your Supabase SQL Editor:
 CREATE TABLE IF NOT EXISTS public.items ( ... );
@@ -232,7 +224,7 @@ CREATE TABLE IF NOT EXISTS public.matches ( ... );
             </pre>
           </div>
           <div className="text-[11px] text-slate-500">
-            A full production schema with RLS and indexes is also saved in your project root at <code className="text-emerald-400">supabase-schema.sql</code>.
+            A full production schema with RLS and indexes is also saved in your project root at <code className="text-emerald-700 font-bold">supabase-schema.sql</code>.
           </div>
         </div>
 
